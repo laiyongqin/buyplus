@@ -1,0 +1,119 @@
+<extend name="Layout/Back"/>
+<block name="content">
+    <div id="content">
+        <div class="page-header">
+            <div class="container-fluid">
+                <div class="pull-right">
+                    <button class="btn btn-primary" data-toggle="tooltip" form="form-brand" title="保存" type="submit">
+                        <i class="fa fa-save">
+                        </i>
+                    </button>
+                    <a class="btn btn-default" data-toggle="tooltip" href="{:U('list')}" title="取消">
+                        <i class="fa fa-reply">
+                        </i>
+                    </a>
+                </div>
+                <h1>
+                    品牌
+                </h1>
+                <ul class="breadcrumb">
+                    <li>
+                        <a href="{:U('Manage/index')}">
+                            首页
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            品牌
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <i class="fa fa-pencil">
+                        </i>
+                        添加品牌
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <form action="{:U('add')}" class="form-horizontal" enctype="multipart/form-data" id="form-brand" method="post">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a data-toggle="tab" href="#tab-general">
+                                    基本信息
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="tab-general">
+                                <div class="form-group required">
+                                    <label class="col-sm-2 control-label" for="input-name2">
+                                        品牌
+                                    </label>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" id="input-title" name="title" placeholder="品牌" type="text" value=""/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label" for="input-sort_number">
+                                        排序
+                                    </label>
+                                    <div class="col-sm-10">
+                                        <input class="form-control" id="input-sort_number" name="sort_number" placeholder="排序" type="text" value="0"/>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">
+                                        图片
+                                    </label>
+                                    <div class="col-sm-10">
+                                        <input class="" id="input-logo_ori" name="logo_ori" type="file">
+                                        </input>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</block>
+<block name="bottomJS">
+    <script src="__PUBLIC__/Back/validation/jquery.validate.min.js" type="text/javascript">
+    </script>
+    <script src="__PUBLIC__/Back/validation/additional-methods.min.js" type="text/javascript">
+    </script>
+    <script src="__PUBLIC__/Back/validation/localization/messages_zh.min.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+     $(function(){
+      $('#form-brand').validate({
+        rules: {
+          title: {
+            required: true,
+            remote: '{:U('ajax', ['operate'=>'checkBrandUnique'])}'
+          },
+          sort_number: {
+            digits: true,
+          }
+        },
+
+        messages: {
+          title: {
+            required: '品牌名称必须填写',
+            remote: '品牌名称已经存在,请重新填写',
+          },
+
+          sort_number: {
+            digits: '排序字段要求为整数',
+          }
+        }
+      }) 
+    })
+    </script>
+</block>
