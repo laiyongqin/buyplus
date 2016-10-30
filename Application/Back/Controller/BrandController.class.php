@@ -110,10 +110,14 @@ class BrandController extends Controller
     public function multiAction()
     {
         //确定动作
-        $operate = I('post.operate', 'delete', 'trim');
+        $operate = I('post.operate_type', 'delete', 'trim');
 
         //确定主键列表
         $selected = I('post.selected', []);
+        if (empty($selected)) {
+            $this->redirect('list', [], 0);
+            return;
+        }
 
         switch ($operate) {
             case 'delete':
