@@ -3,6 +3,8 @@ namespace Back\Controller;
 
 use Think\Controller;
 use Think\Page;
+use Think\Upload;
+use Think\Image;
 
 class BrandController extends Controller
 {
@@ -14,6 +16,32 @@ class BrandController extends Controller
     {
         if (IS_POST) {
             //数据处理
+            $t_upload = new Upload;
+            //配置上传的属性
+            $t_upload->rootPath = APP_PATH . 'Upload/';
+            $t_upload->savePath = 'Brand/';
+            $t_upload->exts     = ['jpeg', 'png', 'git', 'jpg'];//设置上传的文件格式
+            $t_upload->maxSize  = 1 * 1024 * 1024;//文件大小
+            $upload_info = $t_upload->uploadOne($_FILES['logo_ori']);
+            // dump($upload_info);die();
+            //上传成功讲数据保存到POST数组中,便于create()创建数据
+            if ($upload_info) {
+                $_POST['logo_ori'] = $upload_info['savepath'] . $upload_info['savename'];
+            }
+            //生成缩略图
+            $t_image = new Image();
+            $t_image->open($t_upload->rootPath . $_POST['logo_ori']);
+            $w = getConfig('brand_thumb_width', 100);
+            $h = getConfig('brand_thumb_height', 100);
+            $thumb_root = './Public/Thumb/';
+            $thumb_path = $thumb_root . $upload_info['savepath'];
+            if (! is_dir($thumb_path)) {
+                mkdir($thumb_path, 0775, true);
+            }
+            $thumb_file = $thumb_path . 'thumb_' . $w . 'x' . $h . '_' .$upload_info['savename'];
+            $t_image->thumb($w, $h)->save($thumb_file);
+            $_POST['logo'] = $upload_info['savepath'] . 'thumb_' . $w . 'x' . $h . '_' .$upload_info['savename'];
+
             $model  = D('Brand');
             $result = $model->create();
 
