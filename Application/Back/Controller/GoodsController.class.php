@@ -2,7 +2,9 @@
 namespace Back\Controller;
 
 use Think\Controller;
+use Think\Image;
 use Think\Page;
+use Think\Upload;
 
 class GoodsController extends Controller
 {
@@ -15,7 +17,7 @@ class GoodsController extends Controller
             ->find($goods_id);
         //获取索引对象
         require VENDOR_PATH . 'XunSearch/lib/XS.php';
-        $xs = new \XS('goods');
+        $xs    = new \XS('goods');
         $index = $xs->index;
         //索引文档对象处理
         $doc = new \XSDocument;
@@ -31,7 +33,6 @@ class GoodsController extends Controller
         // 判断是否为POST数据提交
         if (IS_POST) {
             // 数据处理
-            // $model = M('Goods');
             $model  = D('Goods');
             $result = $model->create();
 
@@ -39,12 +40,104 @@ class GoodsController extends Controller
                 $this->error('数据添加失败: ' . $model->getError(), U('add'));
             }
 
-            $result = $model->add();
-            if (!$result) {
+            $goods_id = $model->add();
+            if (!$goods_id) {
                 $this->error('数据添加失败:' . $modle->getError(), U('add'));
             }
-            //自动更新当前商品对应的索引
-            $this->addIndex($result);
+            // 自动更新当前商品对应的索引
+            // $this->addIndex($goods_id);
+
+            //商品相册图像数据添加
+            $t_upload = new Upload();
+            //配置上传信息
+            $t_upload->rootPath = APP_PATH . 'Upload/';
+            $t_upload->savePath = 'Goods/';
+            $t_upload->exts     = ['jpeg', 'jpg', 'gif', 'png'];
+            $t_upload->maxSize  = 2 * 1024 * 1024;
+            //开始上传
+            $goods_image_list = $t_upload->uploadMulti($_FILES['goods_image']);
+            //生成缩略图
+            $t_image = new Image;
+            //配置缩略图信息
+            $thumb_root = './Public/Thumb/';
+
+            $w_s = getConfig('goods_small_width', 100);
+            $h_s = getConfig('goods_small_height', 100);
+
+            $w_m = getConfig('goods_medium_width', 300);
+            $h_m = getConfig('goods_medium_height', 300);
+
+            $w_b = getConfig('goods_big_width', 800);
+            $h_b = getConfig('goods_big_height', 800);
+
+            foreach ($goods_image_list as $key => $image) {
+                if (!is_dir($thumb_root . $image['savepath'])) {
+                    mkdir($thumb_root . $image['savepath'], 0775, ture);
+                }
+
+                $s_file = $image['savepath'] . 'small_' . $image['savename'];
+                $t_image->open(APP_PATH . 'Upload/' . $image['savepath'] . $image['savename']);
+                $t_image->thumb($w_s, $h_s)->save($thumb_root . $s_file);
+
+                $m_file = $image['savepath'] . 'medium_' . $image['savename'];
+                $t_image->open(APP_PATH . 'Upload/' . $image['savepath'] . $image['savename']);
+                $t_image->thumb($w_m, $h_m)->save($thumb_root . $m_file);
+
+                $b_file = $image['savepath'] . 'big_' . $image['savename'];
+                $t_image->open(APP_PATH . 'Upload/' . $image['savepath'] . $image['savename']);
+                $t_image->thumb($w_b, $h_b)->save($thumb_root . $m_file);
+                //拼凑数据,插入数据库
+                $date_image[] = [
+                    'goods_id'     => $goods_id,
+                    'image'        => $image['savepath'] . $image['savename'],
+                    'image_small'  => $s_file,
+                    'image_medium' => $m_file,
+                    'image_big'    => $b_file,
+                    'sort_number'  => I('post.goods_image.' . $key . '.sort_number'),
+                ];
+            }
+            //一次插入goods_image数据记录
+            M('GoodsImage')->addAll($date_image);
+
+            //保存商品属性
+            $attr_list  = I('post.attribute');
+            $value_data = [];
+            foreach ($attr_list as $goods_attribute_id => $value) {
+                $m_attr_option = M('AttributeOption');
+                if (is_string($value) && strpos($value, '|||') !== fasle) {
+                    //是多值自定义属性
+                    $option_data['goods_attribute_id'] = $goods_attribute_id;
+                    foreach (explode('|||', $value) as $option_title) {
+                        $option_data['title'] = $option_title;
+                        $cond                 = $option_data;
+                        if ($attribute_option_id = $m_attr_option->where($cond)->getField('attribute_option_id')) {
+                            $new_option_id[] = $attribute_option_id;
+                            continue;
+                        }
+                        $new_option_id[] = $m_attr_option->add($option_data);
+                    }
+                    $value = $new_option_id;
+                }
+
+                //判断是否为多选
+                $is_option = 0;
+                if (is_array($value)) {
+                    $value = implode(',', $value);
+
+                    $is_option_list = I('post.is_option', []);
+                    if (in_array($goods_attribute_id, $is_option_list)) {
+                        $is_option = 1;
+                    }
+                }
+                $value_data[] = [
+                    'goods_id'           => $goods_id,
+                    'goods_attribute_id' => $goods_attribute_id,
+                    'value'              => $value,
+                    'is_option'          => $is_option,
+                ];
+            }
+            M('GoodsAttributeValue')->addAll($value_data);
+
             // 成功重定向到list页
             $this->redirect('list', [], 0);
         } else {
@@ -60,6 +153,9 @@ class GoodsController extends Controller
             $this->assign('tax_list', M('Tax')->select());
             //库存状态
             $this->assign('stock_status_list', M('StockStatus')->select());
+
+            //获取商品属性分组
+            $this->assign('goods_type_list', M('GoodsType')->select());
             // 表单展示
             $this->display();
         }
@@ -207,6 +303,23 @@ class GoodsController extends Controller
                 $count = M('Goods')->where($cond)->count();
                 // 如果记录数>0, 条件为真, 说明存在记录, 重复, 验证未通过, 响应false
                 echo $count ? 'false' : 'true';
+                break;
+
+            case 'getAttribute':
+                $cond['goods_type_id'] = I('request.goods_type_id');
+                //获取当前分类下的全部属性
+                $rows = D('GoodsAttribute')->field('ga.*, gat.title type_title')->alias('ga')->join('left join __ATTRIBUTE_TYPE__ gat using(attribute_type_id)')->relation(true)->where($cond)->select();
+                if ($rows) {
+                    $this->ajaxReturn([
+                        'error' => 0,
+                        'rows'  => $rows,
+                    ]);
+                } else {
+                    $this->ajaxReturn([
+                        'error'     => 1,
+                        'errorInfo' => '查询数据不存在',
+                    ]);
+                }
                 break;
         }
     }

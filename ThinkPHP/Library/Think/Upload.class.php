@@ -111,6 +111,23 @@ class Upload {
         $info = $this->upload(array($file));
         return $info ? $info[0] : $info;
     }
+    /**
+     * 自定义批量上传函数
+     * @param  [type] $files [description]
+     * @return [type]        [description]
+     */
+    public function uploadMulti($files){
+        foreach ($files['name'] as $key => $value) {
+            $file['name'] = $files['name'][$key];
+            $file['type'] = $files['type'][$key];
+            $file['tmp_name'] = $files['tmp_name'][$key];
+            $file['error'] = $files['error'][$key];
+            $file['size'] = $files['size'][$key];
+            $result[$key] = $this->uploadOne($file);
+        }
+
+        return $result;
+    }
 
     /**
      * 上传文件
