@@ -5,10 +5,21 @@ return array(
     'URL_MODEL'       => 2,
     'URL_ROUTER_ON'   => true,
     'URL_ROUTE_RULES' => [
-        'register' => 'Member/register',
-        'login'    => 'Member/login',
-        'verify'   => 'Member/verify',
+        'register'  => 'Member/register',// 注册URL
+        'center'    => 'Member/center', // 用户中心
+        'login'     => 'Member/login', // 登陆
+        'verify'    => 'Member/verify',// 验证码
+        'logout'    => 'Member/logout', // 退出
+
+        'index' => 'Shop/index',
+        
+        // 带参数的路由
+        'goods/:goods_id\d'   => 'Shop/goods' 
+        
     ],
     'LOAD_EXT_CONFIG' => 'db',
     'SESSION_TYPE'    => 'Db',
+
+    'DEFAULT_CONTROLLER'    => 'Shop',
+    'DEFAULT_ACTION'    => 'index',
 );
