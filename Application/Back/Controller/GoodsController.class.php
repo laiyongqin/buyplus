@@ -85,7 +85,7 @@ class GoodsController extends Controller
 
                 $b_file = $image['savepath'] . 'big_' . $image['savename'];
                 $t_image->open(APP_PATH . 'Upload/' . $image['savepath'] . $image['savename']);
-                $t_image->thumb($w_b, $h_b)->save($thumb_root . $m_file);
+                $t_image->thumb($w_b, $h_b)->save($thumb_root . $b_file);
                 //拼凑数据,插入数据库
                 $date_image[] = [
                     'goods_id'     => $goods_id,
@@ -137,6 +137,9 @@ class GoodsController extends Controller
                 ];
             }
             M('GoodsAttributeValue')->addAll($value_data);
+
+            //调用方法生成静态页面
+            $this->staticGoods($goods_id);
 
             // 成功重定向到list页
             $this->redirect('list', [], 0);
@@ -274,6 +277,47 @@ class GoodsController extends Controller
                 # code...
                 break;
         }
+    }
+
+    public function staticgoods($goods_id)
+    {
+        if ($goods_id == 0) {
+            $this->redirect('/index', [], 0);
+        }
+
+        $m_goods = D('Home/Goods');
+
+        // 获取商品信息
+        $goods = $m_goods->find($goods_id);
+        $this->assign('goods', $goods);
+
+        // 面包屑信息
+        $breadcrumb = $m_goods->getBreadcrumb($goods_id);
+        $this->assign('breadcrumb', $breadcrumb);
+        // dump($breadcrumb);die;
+
+        // 图像展示
+        $this->assign('image_list', M('GoodsImage')->where(['goods_id' => $goods_id])->select());
+
+        //属性信息
+        $attribute_list = D('Home/GoodsAttributeValue')->field('gav.*, ga.title attribute_title, at.title type_title')->where(['goods_id' => $goods_id])->alias('gav')->join('left join __GOODS_ATTRIBUTE__ ga using(goods_attribute_id)')->join('left join __ATTRIBUTE_TYPE__ at using(attribute_type_id)')->relation(true)->select();
+
+        $option_list = [];
+        foreach ($attribute_list as $key => $attribute) {
+            if ($attribute['type_title'] == 'select') {
+                $attribute_list[$key]['option'] = M('AttributeOption')->where(['attribute_option_id' => ['in', $attribute['value']]])->select();
+            }
+            if ($attribute['is_option'] == '1') {
+                $option_list[] = $attribute_list[$key];
+            }
+        }
+
+        $this->assign('attribute_list', $attribute_list);
+        $this->assign('option_list', $option_list);
+
+        $content = $this->fetch('Home@Shop:goods');
+        $file = './goods/'. $goods_id. '.html';
+        file_put_contents($file, $content);
     }
 
     /**

@@ -2,20 +2,19 @@
 
 namespace Home\Controller;
 
-
 class ShopController extends CommonController
 {
 
     public function indexAction()
     {
-              
+
         // 推荐商品数据
         $m_goods = D('Goods');
         $this->assign('promote_goods_list', $m_goods->getPromote());
 
         // 展示首页模板
         $this->display();
-        
+
     }
 
     /**
@@ -30,8 +29,8 @@ class ShopController extends CommonController
         // 搜索(不满足自动加载)
         require VENDOR_PATH . 'XunSearch/lib/XS.php';
         $project = 'goods';
-        $xs = new XS($project);
-        $search = $xs->search;
+        $xs      = new XS($project);
+        $search  = $xs->search;
         // 是否模糊搜索
         // $search->setFuzzy(true);
         $search->setQuery($query);
@@ -50,10 +49,10 @@ class ShopController extends CommonController
         // 如果搜索匹配数量较少, 给出用户建议:
         if ($count <= 3) {
             // 需要给出建议
-           $words1 = $search->getExpandedQuery($query, 3);
-           $words2 = $search->getCorrectedQuery($query);
-           // 合并两组词, 取出重复词即可
-           $words = array_unique(array_merge($words1, $words2));
+            $words1 = $search->getExpandedQuery($query, 3);
+            $words2 = $search->getCorrectedQuery($query);
+            // 合并两组词, 取出重复词即可
+            $words = array_unique(array_merge($words1, $words2));
         }
 
     }
@@ -79,11 +78,51 @@ class ShopController extends CommonController
         $breadcrumb = $m_goods->getBreadcrumb($goods_id);
         $this->assign('breadcrumb', $breadcrumb);
         // dump($breadcrumb);die;
-         
-        // 图像展示
-        $this->assign('image_list', M('GoodsImage')->where(['goods_id'=>$goods_id])->select());
 
+        // 图像展示
+        $this->assign('image_list', M('GoodsImage')->where(['goods_id' => $goods_id])->select());
+
+        //属性信息
+        $attribute_list = D('GoodsAttributeValue')->field('gav.*, ga.title attribute_title, at.title type_title')->where(['goods_id' => $goods_id])->alias('gav')->join('left join __GOODS_ATTRIBUTE__ ga using(goods_attribute_id)')->join('left join __ATTRIBUTE_TYPE__ at using(attribute_type_id)')->relation(true)->select();
+
+        $option_list = [];
+        foreach ($attribute_list as $key => $attribute) {
+            if ($attribute['type_title'] == 'select') {
+                $attribute_list[$key]['option'] = M('AttributeOption')->where(['attribute_option_id' => ['in', $attribute['value']]])->select();
+            }
+            if ($attribute['is_option'] == '1') {
+                $option_list[] = $attribute_list[$key];
+            }
+        }
+
+        $this->assign('attribute_list', $attribute_list);
+        $this->assign('option_list', $option_list);
 
         $this->display();
+    }
+
+    public function ajaxAction()
+    {
+        $operate = I('request.operate', '', 'trim');
+        if ($operate == '') {
+            $this->ajaxReturn(['error' => 1, 'errorInfo' => '没有操作']);
+        }
+        switch ($operate) {
+            case 'getProduct':
+                $product_list = D('GoodsProduct')
+                    ->where(['goods_id' => I('request.goods_id', '0')])
+                    ->relation(true)
+                    ->select();
+                if ($product_list) {
+                    $this->ajaxReturn(['error' => 0, 'rows' => $product_list]);
+                } else {
+                    $this->ajaxReturn(['error' => 1, 'errorInfo' => '当前商品不存在选项']);
+                }
+                break;
+
+            default:
+                # code...
+                break;
+        }
     }
 }

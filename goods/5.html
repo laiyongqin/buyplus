@@ -1,29 +1,131 @@
-<extend name="Home@Layout/Shop" />
+<!DOCTYPE html>
+<!--[if IE]>
+<![endif]-->
+<!--[if IE 8 ]>
+<html dir="ltr" lang="zh-CN" class="ie8">
+  <![endif]-->
+  <!--[if IE 9 ]>
+  <html dir="ltr" lang="zh-CN" class="ie9">
+    <![endif]-->
+    <!--[if (gt IE 9)|!(IE)]>
+    <!-->
+    <html dir="ltr" lang="zh-CN">
+      <!--<![endif]-->
+<head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <title>BuyPlus(败家Shopping）| </title>
+      
+    <meta name="description" content="" />
+    <meta name="keywords" content= "" />
 
-<block name="title">{$goods['meta_title']}</block>
-<block name="seo">
-    <meta name="description" content="{$goods['meta_description']}" />
-    <meta name="keywords" content= "{$goods['meta_keywords']}" />
-</block>
 
-<block name="breadcrumb">
+      <link href="/buyplus/Public/Home/image/catalog/cart.png" rel="icon" />
+      <link href="/buyplus/Public/Home/bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen" />
+      <link href="/buyplus/Public/Home/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+      <link href="/buyplus/Public/Home/stylesheet/stylesheet.css" rel="stylesheet">
+      <link href="/buyplus/Public/Home/owl-carousel/owl.carousel.css" type="text/css" rel="stylesheet" media="screen" />
+      <!-- <link href="/buyplus/Public/Home/owl-carousel/owl.transitions.css" type="text/css" rel="stylesheet" media="screen" /> -->
+
+      
+</head>
+<body class="common-home">
+<nav id="top">
+  <div class="container">
+    <div id="top-links" class="nav pull-right">
+      <ul class="list-inline">
+        <li>
+          <a href=""> <i class="fa fa-phone"></i>
+          </a>
+          <span class="hidden-xs hidden-sm hidden-md">000-00000000</span>
+        </li>
+        <li class="dropdown">
+                      <a href="" title="会员中心" class="dropdown-toggle" data-toggle="dropdown"> <i class="fa fa-user"></i>
+              <span class="hidden-xs hidden-sm hidden-md">会员中心</span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right">
+              <li>
+                <a href="/buyplus/back.php/register.html">会员注册</a>
+              </li>
+              <li>
+                <a href="/buyplus/back.php/login.html">会员登录</a>
+              </li>
+            </ul>        </li>
+        <li>
+          <a href="" id="wishlist-total" title="收藏（0）">
+            <i class="fa fa-heart"></i>
+            <span class="hidden-xs hidden-sm hidden-md">收藏（0）</span>
+          </a>
+        </li>
+        <li>
+          <a href="" title="购物车">
+            <i class="fa fa-shopping-cart"></i>
+            <span class="hidden-xs hidden-sm hidden-md">购物车</span>
+          </a>
+        </li>
+        <li>
+          <a href="" title="结账">
+            <i class="fa fa-share"></i>
+            <span class="hidden-xs hidden-sm hidden-md">结账</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<header>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4">
+        <div id="logo">
+          <a href="">
+            <img src="/buyplus/Public/Home/image/logo3.png" title="BuyPlus(败家Shopping）" alt="BuyPlus(败家Shopping）" class="img-responsive" />
+          </a>
+        </div>
+      </div>
+      <div class="col-sm-8 mini-cart">
+        <div id="cart">
+          <a href="" class="cart-info">
+            <span class="cart-icon">
+              <i class="fa fa-shopping-cart"></i>
+            </span>
+            <span id="cart-total">0 个商品 - ￥0.00</span>
+          </a>
+          <ul class="cart-content dropdown-menu hidden-sm hidden-xs">
+            <li>
+              <p class="text-center empty">您的购物车内没有商品！</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+
+<div class="container">
+  
     <ul class="breadcrumb">
         <li>
-            <a href="{:U('/index')}"> <i class="fa fa-home"></i>
+            <a href="/buyplus/back.php/index.html"> <i class="fa fa-home"></i>
             </a>
         </li>
-        <volist name="breadcrumb" id="item">
-            <li>
-                <a href="{:U('/category/'.$item['category_id'])}">{$item['title']}</a>
-            </li>
-        </volist>
         <li>
-            <a href="javascirpt:;">{$goods['name']}</a>
+                <a href="/buyplus/back.php/category/1.html">未分类</a>
+            </li>        <li>
+            <a href="javascirpt:;">Dell1020</a>
         </li>
     </ul>
-</block>
 
-<block name="content">
+  <div class="row">
+
+    <div id="content" class="col-sm-12">
+      <!-- 用于被子模板重写的模块 -->
+      
     <div class="product-detail">
         <div class="row">
             <div class="col-sm-5">
@@ -32,24 +134,23 @@
                     <!-- 当前中图, 默认为第一张图的中图-->
                     <div class="elevate-zoom-preview">
                         <a href="javascript:;">
-                            <img id="elevate-zoom" src="__PUBLIC__/Thumb/{$image_list[0]['image_medium']}" data-zoom-image="__PUBLIC__/Thumb/{$image_list[0]['image_big']}" class="img-responsive"></a>
+                            <img id="elevate-zoom" src="/buyplus/Public/Thumb/Goods/2016-11-07/medium_582035b31039d.jpg" data-zoom-image="/buyplus/Public/Thumb/Goods/2016-11-07/big_582035b31039d.jpg" class="img-responsive"></a>
                     </div>
 
                     <!-- 小图列表 -->
                     <div id="product-thumbnail-gallery">
-                        <volist name="image_list" id="image">
-                            <a data-zoom-image="__PUBLIC__/Thumb/{$image['image_big']}" data-image="__PUBLIC__/Thumb/{$image['image_medium']}" data-upate="" class="elevatezoom-gallery <if condition="$i eq 1">active</if> href="__PUBLIC__/Thumb/{$image['image_big']}">
-                                <img src="__PUBLIC__/Thumb/{$image['image_small']}" style="max-height:60px; max-width:60px">
-                            </a>
-                        </volist>
-                    </div>
+                        <a data-zoom-image="/buyplus/Public/Thumb/Goods/2016-11-07/big_582035b31039d.jpg" data-image="/buyplus/Public/Thumb/Goods/2016-11-07/medium_582035b31039d.jpg" data-upate="" class="elevatezoom-gallery active href="/buyplus/Public/Thumb/Goods/2016-11-07/big_582035b31039d.jpg">
+                                <img src="/buyplus/Public/Thumb/Goods/2016-11-07/small_582035b31039d.jpg" style="max-height:60px; max-width:60px">
+                            </a><a data-zoom-image="/buyplus/Public/Thumb/Goods/2016-11-07/big_582035b31113d.jpg" data-image="/buyplus/Public/Thumb/Goods/2016-11-07/medium_582035b31113d.jpg" data-upate="" class="elevatezoom-gallery  href="/buyplus/Public/Thumb/Goods/2016-11-07/big_582035b31113d.jpg">
+                                <img src="/buyplus/Public/Thumb/Goods/2016-11-07/small_582035b31113d.jpg" style="max-height:60px; max-width:60px">
+                            </a>                    </div>
                 </div>
                 <!--elevate zoom end--> 
             </div>
 
 
             <div class="col-sm-7 product-info">
-                <h1>{$goods['name']}</h1>
+                <h1>Dell1020</h1>
                 <ul class="product-brief-wrapper">
                     <li>
                         <span>奖励积分</span>
@@ -62,7 +163,7 @@
                     </li>
                 </ul>
                 <div class="product-price-wrapper">
-                    <span class="price-new">￥{$goods['price']}</span>
+                    <span class="price-new">￥13998.00</span>
                     <span class="price-old">￥9,999.00</span>
                     <span>消费积分 0</span>
                
@@ -70,23 +171,7 @@
                 <hr>
                 <div id="product">
                     <h3>选项</h3>
-                    <volist name="option_list" id="option" key="optionI">
-                        <div class="form-group required order-{$optionI}" order="{$optionI}" data-order="{$optionI}">
-                            <label class="control-label">{$option['attribute_title']}</label>
-                            <div id="input-option{$value['goods_attribute_id']}">
-                                <volist name="option['option']" id="value">
-                                
-                                <label class="radio option">
-                                    <input type="radio" name="option[{$value['goods_attribute_id']}]" value="{$value['attribute_option_id']}" />
-                                    <span>{$value['title']}</span>
-                                </label>
-
-                                </volist>
-                               
-                            </div>
-                        </div>
-                    </volist>
-                    <h3>配件</h3>
+                                        <h3>配件</h3>
                     <div class="form-group required">
                         <label class="control-label">你可能也需要</label>
                         <div id="input-option233">
@@ -180,27 +265,12 @@
 
         <div class="tab-content">
             <div class="tab-pane active" id="tab-description">
-                {$goods['description']}
-            </div>
+                            </div>
 
             <div class="tab-pane" id="tab-specification">
                 <table class="table table-bordered">
                     <tbody> 
-                    <volist name="attribute_list" id="attribute">
-                        <tr>
-                            <td>{$attribute['attribute_title']}</td>
-                            <td>
-                                <if condition="$attribute['type_title'] eq select">
-                                <volist name="attribute['option']" id="option">
-                                    {$option['title']}&nbsp;
-                                </volist>
-                                <else />
-                                {$attribute['value']}    
-                                </if>
-                            </td>
-                        </tr> 
-                    </volist>
-                    </tbody>
+                                        </tbody>
                 </table>
             </div>
 
@@ -249,12 +319,132 @@
             </div>
         </div>
     </div>
-</block>
+
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-2">
+        <h5>信息咨询</h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="">关于我们</a>
+          </li>
+          <li>
+            <a href="">最新公告</a>
+          </li>
+          <li>
+            <a href="">隐私政策</a>
+          </li>
+          <li>
+            <a href="">条款及条件</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-2">
+        <h5>客户服务</h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="">联系我们</a>
+          </li>
+          <li>
+            <a href="">退换服务</a>
+          </li>
+          <li>
+            <a href="">网站地图</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-2">
+        <h5>其他</h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="">品牌专区</a>
+          </li>
+          <li>
+            <a href="">礼品券</a>
+          </li>
+          <li>
+            <a href="">加盟会员</a>
+          </li>
+          <li>
+            <a href="">特别优惠</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-2">
+        <h5>会员中心</h5>
+        <ul class="list-unstyled">
+          <li>
+            <a href="">会员中心</a>
+          </li>
+          <li>
+            <a href="">历史订单</a>
+          </li>
+          <li>
+            <a href="">收藏列表</a>
+          </li>
+          <li>
+            <a href="">订阅咨询</a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-sm-4">
+        <h5>联系我们</h5>
+        <ul class="list-unstyled">
+          <li>
+            <div class="icon">
+              <span class="fa fa-map-marker">&nbsp;</span>
+            </div>
+            <div class="text">科技有限公司</div>
+          </li>
+          <li>
+            <div class="icon">
+              <span class="fa fa-phone">&nbsp;</span>
+            </div>
+            <div class="text">123456789</div>
+          </li>
+          <li>
+            <div class="icon">
+              <span class="fa fa-envelope">&nbsp;</span>
+            </div>
+            <div class="text">kang@kang.com</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="powered">
+      BuyPlush(败家Shopping) &copy; 2016
+      <a href="http://www.miitbeian.gov.cn/" target="_blank">京ICP备12345678号</a>
+    </div>
+  </div>
+  <div class="go-top">
+    <a href="#" class="scroll-top">
+      <i class="fa fa-angle-up"></i>
+      TOP
+    </a>
+  </div>
+</footer>
+
+<script src="/buyplus/Public/Home/javascript/jquery-1.11.3.min.js" type="text/javascript"></script>
+<script src="/buyplus/Public/Home/bootstrap/js/bootstrap.min.js" type="text/javascript"></script>
+<script src="/buyplus/Public/Home/javascript/common.js" type="text/javascript"></script>
+
+<script>
+  $('.sub-menu>li').mouseenter(function(e){
+    $(this).parent().find('ul.second-menu').hide().eq($(this).index()).show();
+  });
+</script>
 
 
-<block name="appendJS" >
-    <script src="__PUBLIC__/Home/elevateZoom/jquery.elevateZoom.min.js" type="text/javascript"></script>
-    <script src="__PUBLIC__/Home/fancybox/jquery.fancybox.js" type="text/javascript"></script>
+    <script src="/buyplus/Public/Home/elevateZoom/jquery.elevateZoom.min.js" type="text/javascript"></script>
+    <script src="/buyplus/Public/Home/fancybox/jquery.fancybox.js" type="text/javascript"></script>
 
     <script>
         $(document).ready(function(){
@@ -291,9 +481,9 @@
     <script>
 
     $(function() {
-        var url = '{:U('ajax', ['operate'=>'getProduct'])}';
+        var url = '/buyplus/back.php/Goods/ajax/operate/getProduct.html';
         var data = {
-            'goods_id' :  {$goods['goods_id']},
+            'goods_id' :  5,
         };
         $.get(url, data, function(response){
             if (response.error == 0) {
@@ -393,4 +583,6 @@
         
     });
     </script>
-</block>
+
+</body>
+</html>
