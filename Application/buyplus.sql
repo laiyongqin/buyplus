@@ -400,3 +400,17 @@ create table ye_product_option
 	index (goods_product_id),
 	index (attribute_option_id)
 )charset=utf8;
+
+--所购商品表
+create table ye_cart_goods
+(
+	cart_goods_id int unsigned auto_increment,
+	member_id int unsigned not null default 0,
+	goods_id int unsigned not null default 0,
+	goods_product_id int unsigned not null default 0,
+	buy_quantity int unsigned not null default 0,
+	primary key(cart_goods_id),
+	index(member_id),
+	index(goods_id),
+	index(goods_product_id)
+)charset=utf8;

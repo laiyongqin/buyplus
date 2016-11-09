@@ -109,15 +109,19 @@
                         </div>
                     </div>
                     <hr>
+                    <form action="{:U('/addGoods')}" method="post" id="form-buyInfo">
+                    <input type="hidden" name="goods_id" value="{$goods['goods_id']}">
+                    <input type="hidden" name="goods_product_id" value="0">
                     <div class="product-cart-action">
                         <div class="quantity-input-wrapper">
-                            <input type="text" name="quantity" value="1" placeholder="数量" id="input-quantity" class="form-control" />
+                            <input type="text" name="buy_quantity" value="1" placeholder="数量" id="input-quantity" class="form-control" />
                             <a href="#" class="quantity-up">+</a>
                             <a href="#" class="quantity-down">-</a>
                         </div>
-                        <button type="button" id="button-cart" data-loading-text="正在加载..." class="btn btn-primary">加入购物车</button>
+                        <button type="submit" id="button-cart" data-loading-text="正在加载..." class="btn btn-primary">加入购物车</button>
                         <input type="hidden" name="product_id" value="61" />
                     </div>
+                    </form>
                 </div>
                 <div class="wishlist-share">
                     <a onclick="wishlist.add('61');"> <i class="fa fa-heart"></i>
@@ -185,20 +189,20 @@
 
             <div class="tab-pane" id="tab-specification">
                 <table class="table table-bordered">
-                    <tbody> 
+                    <tbody>
                     <volist name="attribute_list" id="attribute">
                         <tr>
                             <td>{$attribute['attribute_title']}</td>
                             <td>
-                                <if condition="$attribute['type_title'] eq select">
-                                <volist name="attribute['option']" id="option">
-                                    {$option['title']}&nbsp;
-                                </volist>
-                                <else />
-                                {$attribute['value']}    
-                                </if>
+                            <if condition="$attribute['type_title'] eq select">
+                            <volist name="attribute['option']" id="option">
+                            {$option['title']}&nbsp;
+                            </volist>
+                            <else />
+                            {$attribute['value']}
+                            </if>
                             </td>
-                        </tr> 
+                        </tr>
                     </volist>
                     </tbody>
                 </table>
@@ -297,22 +301,25 @@
         };
         $.get(url, data, function(response){
             if (response.error == 0) {
-                // console.log(response.rows);// 全部的货品列表 ,以及货品对应的选项值
+                console.log(response.rows);// 全部的货品列表 ,以及货品对应的选项值
                 
                 var attribute_option_id_list = [];
                 var product_option_list = [];
                 $.each(response.rows, function(index, value) {
-
+                    // 整理出来所有的可用货品选项组合
+                    
                     // 现获取全部可能的货品选项ID
                     // value每个货品
                     var product_option = [];
                     $.each(value.option, function(i, v) {
                         // v 就每个option
                         attribute_option_id_list.push(v.attribute_option_id);
+
                         product_option.push(v.attribute_option_id);
                     });
 
                     product_option_list.push(product_option);
+
                 });
                 console.log(product_option_list);
                 // 过滤出来所有可能的选项
@@ -327,7 +334,7 @@
 
                 // 绑定所有的label点击事件
                 $('label.option').click(function(evt) {
-                    // 判断上级是否被选择
+                    // 一: 判断上级是否被选择
                     // 获取当前的order
                     // var currOrder = $(this).parent().parent().attr('order');
                     var currOrder = parseInt($(this).parent().parent().data('order'));// data-order
@@ -336,61 +343,110 @@
                         var prevOrder = currOrder - 1;
                         // 上级div中, 被选中的radio的数量
                         if ($('div[order='+prevOrder+']').find(':radio:checked').size() == 0) {
+                            // 阻止默认行为
                             evt.preventDefault();
                             console.log('请先确定上面的选项');
+
                             return false;
-                        }
+                        } 
                     }
-                    //检测当前可用的货品选项
+
+                    // 二: 检测当前可用的货品选项
+                    // 1, 整理出来所有的可用货品选项组合[1, 13], [3, 15](遍历货品) product_option_list
+                    // 2, 整理当前已经选择的选项
                     var checked_list = [];
                     $(':radio[name^=option]:checked').each(function(i) {
+                        // 遍历所有已经选中的选项
                         checked_list.push($(this).val());
-                    });
-                    //获取可能出现的货品选项
+                    });//[1]
+                    // console.log(checked_list);
+                    // 3, 获取可能出现的货品选项
                     var product_enabled_list = [];
                     $.each(product_option_list, function(i, v) {
-                        var flag = true;
-                        $.each(checked_list, function(ii, vv) {
-                            if(v[ii] != vv){
+                        var flag = true;// 假设每个货品都符合当前选中的选项
+                        // v 每个货品数据
+                        // 检测货品中与当前选项匹配货品
+                        $.each(checked_list, function(ii, vv){
+                            //  vv 当前被选中的值
+                            if (v[ii] != vv) {
+                                // 当前的货品不是以及选择的选项货品
                                 flag = false;
-                                return false;
+                                return false;                    
                             }
                         });
-                        if(flag) {
-                           product_enabled_list.push(v); 
+
+                        // 判断标志flag, 
+                        if (flag) {
+                            // 当前货品是需要被选择的
+                            product_enabled_list.push(v);
                         }
                     });
-                    console.log(product_enabled_list);
-                    //将可选的选项展示
-                    var index = checked_list.length;
-                    $('div[order='+index+']~div[order]').each(function(i) {
-                        $(this).find(':radio').each(function(ii) {
+                    // console.log(product_enabled_list);
+                    // 4, 将可选项的选项展示, 将不可选的选项禁用(隐藏)
+                    var index = checked_list.length;// 当前已经选择的层级
+                    $('div[order='+checked_list.length+']~div[order]').each(function(i) {
+                        $(this).find(':radio').each(function(ii){
                             var radio_value = $(this).val();
-                            var flag = false;
-                            $.each(product_enabled_list, function(iii, vvv) {
-                                if (vvv[index] == radio_value){
+                            var flag = false;// 不需要展示
+                            // 遍历货品中的对应位置的选项
+                            $.each(product_enabled_list, function (iii, vvv) {
+                                if (vvv[index] == radio_value) {
                                     flag = true;
                                     return false;
                                 }
                             });
 
-                            if(flag) {
+                            if (flag) {
+                                // 选项需要被保留
                                 $(this).parent().removeClass('hidden');
-                            }else {
+                            } else {
+                                // 选应该隐藏
                                 $(this).parent().addClass('hidden');
                             }
+
                         });
                     });
+
+
+                    // 5, 将当前货品ID记录到goods_product_id上:
+                    // 当所有的选项, 都选中时:
+                    // 选中 的数量 == 所有 选项的数量
+                    if ($('input[name^="option["]:checked').size() == product_option_list[0].length) {
+                        // 全部都选择了
+                        // console.log("设置product_id");
+                        // 遍历全部的货品
+                        $.each(response.rows, function(index, value) {
+                            var flag = true;// 默认假设是匹配的
+                            // console.log(this);
+                            var currProduct = value;// 记录当前的货品
+                            // 遍历所有选中的选项值: 
+                            $.each(checked_list, function(i, v) {
+                                // 判断选项值与货品的选项是否匹配
+                                if (currProduct.option[i].attribute_option_id != v) {
+                                    // 出现了不相等的选项
+                                    flag = false;// 不是该货品
+                                    return false;
+                                }
+                            });
+
+                            if (flag) {
+                                // 是当前货品
+                                // 记录下来当前的货品选项
+                                $('input[name=goods_product_id]:eq(0)').val(currProduct.goods_product_id);
+                                return false;// break
+                            }
+
+                        });
+                        
+                    }
+
                 });
             } else {
                 console.log(response.errorInfo);
             }
 
         }, 'json');
-
-
-
-        
+       
     });
     </script>
 </block>

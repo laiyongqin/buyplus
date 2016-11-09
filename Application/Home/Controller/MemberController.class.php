@@ -4,6 +4,7 @@ namespace Home\Controller;
 
 use Think\Model;
 use Think\Verify;
+use Home\Cart\Cart;
 
 /**
  * 会员控制器类
@@ -132,6 +133,10 @@ class MemberController extends CommonController
 			// session中，存储登陆标志
 			unset($row['password']);
 			session('member', $row);
+
+			$cart = new Cart;
+			$cart->mergeCookie();	//合并cookie中的商品到
+			// die;
 
 			// 重定向到目标页
 			$this->redirect('/center', [], 0);
