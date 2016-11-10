@@ -414,3 +414,32 @@ create table ye_cart_goods
 	index(goods_id),
 	index(goods_product_id)
 )charset=utf8;
+
+-- 货运地址
+create table ye_address
+(
+	address_id int unsigned auto_increment,
+	member_id int unsigned not null default 0, 
+	name varchar(32) not null default '', 
+	telephone varchar(16) not null default '',
+	company varchar(32) not null default '',
+	country_id int unsigned not null default 0,
+	zone_id int unsigned not null default 0,
+	city_id int unsigned not null default 0,
+	address varchar(255) not null default '',
+	post_code char(6) not null default '',
+	is_default tinyint not null default 1, 
+	primary key (address_id),
+	index (member_id),
+	index (country_id),
+	index (zone_id),
+	index (city_id)
+)charset=utf8;
+
+--地区表
+CREATE TABLE `ye_region` (
+  `region_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(128) NOT NULL DEFAULT '',
+  `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`region_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5001 DEFAULT CHARSET=utf8;

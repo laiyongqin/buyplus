@@ -139,7 +139,11 @@ class MemberController extends CommonController
 			// die;
 
 			// 重定向到目标页
-			$this->redirect('/center', [], 0);
+			if ($target = session('login_target')) {
+				$this->redirect($target, [], 0);	
+			} else {
+				$this->redirect('/center', [], 0);
+			}
 
 		} else {
 			// 展示登陆表单

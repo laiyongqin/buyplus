@@ -20,6 +20,8 @@ return array(
         'remove'            => 'Buy/removeGoods',
 
         'cart'              => 'Buy/cart',
+        'order'             => 'Buy/order',
+        'ajax'              => 'Buy/ajax',
 
     ],
     'LOAD_EXT_CONFIG'    => 'db',
