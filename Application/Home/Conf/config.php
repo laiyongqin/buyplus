@@ -22,6 +22,8 @@ return array(
         'cart'              => 'Buy/cart',
         'order'             => 'Buy/order',
         'ajax'              => 'Buy/ajax',
+        'checkout'  => 'Buy/checkout',
+        'orderInfo/:order_sn' => 'Buy/orderInfo',
 
     ],
     'LOAD_EXT_CONFIG'    => 'db',

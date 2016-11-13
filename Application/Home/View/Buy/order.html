@@ -95,19 +95,7 @@
             </div>
             <div id="collapse-shipping-method" class="panel-collapse collapse in" aria-expanded="true" style="">
                 <div class="panel-body">
-                    <p>请选择一个货运方式。</p>
-                    <p> <strong>免运费</strong>
-                    </p>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" checked="checked" value="free.free" name="shipping_method">免运费 - ￥0.00</label>
-                    </div>
-                    <p> <strong>固定运费</strong>
-                    </p>
-                    <div class="radio">
-                        <label>
-                            <input type="radio" value="flat.flat" name="shipping_method">固定运费 - ￥5.00</label>
-                    </div>
+                    <p id="p-shipping-list">请选择一个货运方式。</p>
                     <p>
                         <strong>添加订单备注</strong>
                     </p>
@@ -172,7 +160,7 @@
             <div id="collapse-checkout-confirm" class="panel-collapse collapse in" aria-expanded="true" style="">
                 <div class="panel-body">
                     <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
+                        <table class="table table-bordered table-hover" id="table-goods_list">
                             <thead>
                                 <tr>
                                     <td class="text-left">商品名称</td>
@@ -183,70 +171,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="text-left">
-                                        <a href="http://php.kang.com/test/s/index.php?route=product/product&amp;product_id=61">普利邦欧美大框墨镜男潮2016太阳镜男炫彩百搭驾驶镜男偏光眼镜男</a>
-                                        <br>
-                                        &nbsp;
-                                        <small>- Radio: Small</small>
-                                        <br>
-                                        &nbsp;
-                                        <small>- Checkbox: Checkbox 1</small>
-                                        <br>
-                                        &nbsp;
-                                        <small>- Select: Blue</small>
-                                    </td>
-                                    <td class="text-left">5342</td>
-                                    <td class="text-right">1</td>
-                                    <td class="text-right">￥5,282.00</td>
-                                    <td class="text-right">￥5,282.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <a href="http://php.kang.com/test/s/index.php?route=product/product&amp;product_id=71">2016时尚墨镜 女士偏光太阳镜潮人欧美复古圆框眼镜驾驶镜</a>
-                                    </td>
-                                    <td class="text-left">1252323</td>
-                                    <td class="text-right">1</td>
-                                    <td class="text-right">￥7,770.00</td>
-                                    <td class="text-right">￥7,770.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <a href="http://php.kang.com/test/s/index.php?route=product/product&amp;product_id=77">普利邦欧美大框太阳镜女潮时尚百搭驾驶镜女偏光墨镜女气质简约潮</a>
-                                    </td>
-                                    <td class="text-left">432424</td>
-                                    <td class="text-right">3</td>
-                                    <td class="text-right">￥5,377.00</td>
-                                    <td class="text-right">￥16,131.00</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-left">
-                                        <a href="http://php.kang.com/test/s/index.php?route=product/product&amp;product_id=80">普利邦 欧美时尚大框优雅墨镜女款复古个性防强光太阳镜简约眼镜</a>
-                                    </td>
-                                    <td class="text-left">45615</td>
-                                    <td class="text-right">1</td>
-                                    <td class="text-right">￥2,999.00</td>
-                                    <td class="text-right">￥2,999.00</td>
-                                </tr>
                             </tbody>
                             <tfoot>
                                 <tr>
                                     <td class="text-right" colspan="4">
                                         <strong>商品总额:</strong>
                                     </td>
-                                    <td class="text-right">￥32,182.00</td>
+                                    <td class="text-right">￥<span id="span-total_price"></span></td>
                                 </tr>
                                 <tr>
                                     <td class="text-right" colspan="4">
-                                        <strong>免运费:</strong>
+                                        <strong id="strong-shipping_title">免运费:</strong>
                                     </td>
-                                    <td class="text-right">￥0.00</td>
+                                    <td class="text-right">￥<span id="span-shipping_price">0</span></td>
                                 </tr>
                                 <tr>
                                     <td class="text-right" colspan="4">
                                         <strong>订单总额:</strong>
                                     </td>
-                                    <td class="text-right">￥32,182.00</td>
+                                    <td class="text-right">￥<span id="span-order_total"></span></td>
                                 </tr>
                             </tfoot>
                         </table>
@@ -399,5 +342,112 @@
 
         evt.preventDefault();   //停止点击按钮的默认行为
     });
+    </script>
+    <script>
+        $(function(){
+            var url = '{:U('/ajax')}';
+            var data = {
+                'operate' : 'getShipping',         
+            };
+            $.get(url, data, function(response){
+                if (response.error == 0) {
+                    var html = '';
+                    $.each(response.rows, function(i, row){
+                        html += '<p><strong>'+row.title+'</strong></p><div class="radio"><label>';
+                        html += '<input type="radio" value="'+row.shipping_id+'"name="shipping_method"';
+                        if (row.is_default == '1'){
+                            html += 'checked';
+                        }
+                        html += ' data-price="'+row.price+'"';
+                        html += ' data-title="'+row.title+'"';
+                        html += '>'+row.title+'- ￥'+row.price+'</label></div>';
+                    });
+
+                    $('#p-shipping-list').after(html);
+
+                    //绑定点击事件
+                    $('input[name=shipping_method]').click(function(){
+                        $('#strong-shipping_title').html($(this).data('title'));
+                        $('#span-shipping_price').html($(this).data('price'));
+                        //货运方式改变重新计算总金额
+                        orderTotal();
+                    });
+                }else{
+                    console.log(response.errorInfo);
+                }
+            }, 'json');
+        });
+    </script>
+
+   <script>
+    $(function(){
+        var url = '{:U('/ajax')}';
+        var data = {
+            operate: 'getGoods',
+        };
+        $.get(url, data, function(response) {
+            if (response.error == 0) {
+                var rows = response.rows;
+                var trHtml = '';
+                $.each(rows, function(i, row) {
+                    trHtml += '<tr> <td class="text-left"> <a href="' + row.goods_url + '">' + row.name + '</a> </td>';
+                    trHtml += '<td class="text-left">';
+                    $.each(row.option_list, function(ii, option) {
+                        trHtml += option.ga_title + ': ' + option.ao_title + '<br>';
+                    });
+                    trHtml += '</td> <td class="text-right">' + row.buy_quantity + '</td>';
+                    trHtml += '<td class="text-right">￥' + row.real_price + '</td>';
+                    trHtml += '<td class="text-right">￥' + (row.real_price * row.buy_quantity) + '</td> </tr>';
+                });
+
+                $('#table-goods_list>tbody').empty().append(trHtml);
+
+                var cartInfo = response.cartInfo;
+                $('#span-total_price').html(cartInfo.total_price);
+                // 计算总金额
+                orderTotal();
+            } else {
+                console.log(response.errorInfo);
+            }
+        }, 'json');
+
+    });
+    </script>
+
+    <script>
+        function orderTotal()
+        {
+            var total = Number($('#span-total_price').text()) + Number($('#span-shipping_price').text());
+            $('#span-order_total').text(total);
+        }
+    </script>
+
+    <script>
+        $('#button-confirm').click(function(evt){
+            var orderForm = new FormData();
+            orderForm.append('address_id', $('#select-address_id').val());
+            orderForm.append('shipping_method', $('input[name=shipping_method]:checked').val());
+            orderForm.append('payment_method', $('input[name=payment_method]:checked').val());
+
+            var url = '{:U('/checkout')}';
+            $.ajax({
+                type: 'post',
+                url: url,
+                data: orderForm,
+                success: function(response){
+                    if (response.error == 0) {
+                        console.log('订单成功');
+
+                        location.href=response.order_url;
+                    }else{
+                        console.log(response.errorInfo);
+                    }
+                },
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+            });
+
+        });
     </script>
 </block>

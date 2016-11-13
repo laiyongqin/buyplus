@@ -164,6 +164,11 @@ class Cart
         return ['total_price' => $total_price, 'total_weight' => $total_weight];
     }
 
+    public function getGoodsListRaw()
+    {
+        return $this->goods_list;
+    }
+
     public function clearGoods()
     {
 

@@ -1,0 +1,79 @@
+<extend name="Layout/Shop" />
+
+<block name="content">
+
+<div class="row">
+        <div class="col-sm-12">
+            <div class="well">
+                <h2>你的订单: <span id="span-order_sn">{$order_sn}</span></h2>
+                <p> 
+                    <strong>当前状态: <span id="span-status">处理中,请稍后</span></strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</block>
+
+<block name="appendJS">
+
+	<!-- ajax轮询 -->
+	<!-- <script type="text/javascript">
+		function getOrderStatus(order_sn)
+		{
+			var order_sn = order_sn || $('#span-order_sn').text();
+			var url = '{:U('ajax')}';
+			var data = {
+				operate: 'getOrderStatus',
+				order_sn: order_sn,
+			};
+			$.get(url, data, function(response){
+				if (response.error == 0) {
+					if (response.status == '订单生成成功' || response.status == '订单失败') {
+						$('#span-status').html(response.status);
+						clearInterval(status);
+					}
+				}
+			}, 'json');
+		}
+		//轮询执行
+		var status = setInterval(getOrderStatus, 1000);
+	</script> -->
+
+	<!-- ajax长轮询 -->
+	<script type="text/javascript">
+		$(function(){
+        	getOrderStatusLong();
+		});
+
+		function getOrderStatusLong(order_sn)
+		{
+			var order_sn = order_sn || $('#span-order_sn').text();
+
+			var url = '{:U('ajax')}';
+			var data = {
+				operate: 'getOrderStatus',
+				order_sn: order_sn,
+			};
+			$.ajax({
+				type: 'get',
+				url: url,
+				data: data,
+				success: function(response){
+					if (response.error == 0) {
+						 if (response.status == '订单生成成功' || response.status == '订单失败') {
+                        	$('#span-status').html(response.status);
+                    	}
+					}
+				},
+				dataType: 'json',
+				timeout: 10*1000,
+				error: function(xhr, errorStatus){
+					if (errorStatus == 'timeout') {
+						getOrderStatusLong();
+					}
+				}
+			});
+		}
+	</script>
+
+</block>

@@ -443,3 +443,66 @@ CREATE TABLE `ye_region` (
   `parent_id` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`region_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5001 DEFAULT CHARSET=utf8;
+
+-- 支付方式
+create table ye_payment
+(
+	payment_id int unsigned auto_increment,
+	`key` varchar(32) not null default '',
+	title varchar(32) not null default '',
+	is_default tinyint not null default 0,
+	enabled tinyint not null default 1,
+	sort_number int not null default 0,
+	primary key (payment_id),
+	unique key (`key`),
+	index (sort_number)
+) charset=utf8;	
+
+-- 配送方式
+create table ye_shipping
+(
+	shipping_id int unsigned auto_increment,
+	`key` varchar(32) not null default '',
+	title varchar(32) not null default '',
+	is_default tinyint not null default 0,
+	enabled tinyint not null default 1,
+	sort_number int not null default 0,
+	primary key (shipping_id),
+	unique key (`key`),
+	index (sort_number)
+) charset=utf8;	
+
+create table ye_order
+(
+	order_id int unsigned auto_increment,
+	member_id int unsigned not null default 0,
+	order_time int not null default 0,
+	order_status enum('未确定', '确定', '取消', '删除') not null default '未确定',
+	payment_id int unsigned not null default 0,
+	payment_status enum ('未支付', '已支付') not null default '未支付',
+	address_id int unsigned not null default 0,
+	shipping_id int unsigned not null default 0,
+	shipping_status enum('未发货', '已发货', '已收货') not null default '未发货',
+	total decimal(10, 2) not null default 0,
+	goods_total decimal(10, 2) not null default 0,
+	shipping_total decimal(10, 2) not null default 0,
+	primary key (order_id),
+	index (payment_id),
+	index (address_id),
+	index (shipping_id),
+	index (member_id)
+) charset=utf8;
+
+create table ye_order_goods
+(
+	order_goods_id int unsigned auto_increment,
+	order_id int unsigned not null default 0,
+	goods_id int unsigned not null default 0,
+	goods_product_id int unsigned not null default 0,
+	buy_quantity int not null default 0,
+	buy_price decimal(10, 2) not null default 0,
+	primary key (order_goods_id),
+	index (order_id),
+	index (goods_id),
+	index (goods_product_id)
+) charset=utf8;
